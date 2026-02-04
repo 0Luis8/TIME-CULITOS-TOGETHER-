@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TIME CULITOS TOGETHER</title>
+  <meta name="description" content="Un espacio para elegir tiempo de calidad en pareja y dejar el móvil a un lado." />
+
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- React + ReactDOM CDN -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+
+  <!-- Babel (para JSX en un solo fichero) -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body class="bg-neutral-100">
+
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    const initialActivities = [
+      {
+        id: 1,
+        title: "Lectura compartida",
+        category: "Conexión",
+        description: "Leer juntos y comentar lo leído sin prisas.",
+        goal: "Compartir ideas y emociones",
+        duration: "30–60 min",
+        music: "Piano, lo-fi, jazz suave",
+        questions: ["¿Qué parte te ha resonado más?"],
+      },
+      {
+        id: 2,
+        title: "Preguntas profundas",
+        category: "Conexión",
+        description: "Un espacio seguro para hablar de verdad.",
+        goal: "Seguir conociéndonos",
+        duration: "20–40 min",
+        music: "Indie acústico",
+        questions: ["¿Qué momento nuestro atesoras más?"],
+      },
+      {
+        id: 3,
+        title: "Proyecto LEGO",
+        category: "Creatividad",
+        description: "Avanzar poco a poco en vuestra figura LEGO.",
+        goal: "Trabajo en equipo",
+        duration: "Sesiones libres",
+        music: "Bandas sonoras",
+        questions: ["¿Cómo nos organizamos mejor?"],
+      },
+      {
+        id: 4,
+        title: "Arcilla creativa",
+        category: "Creatividad",
+        description: "Crear sin expectativas, solo disfrutar.",
+        goal: "Presencia y diversión",
+        duration: "45–90 min",
+        music: "Ambient",
+        questions: ["¿Qué has sentido creando?"],
+      },
+      {
+        id: 5,
+        title: "Ritual de masaje",
+        category: "Cuidado",
+        description: "Dar y recibir masaje con atención plena.",
+        goal: "Cuidado mutuo",
+        duration: "30–60 min",
+        music: "Ambient relajante",
+        questions: ["¿Dónde notas más tensión?"],
+      }
+    ];
+
+    function App() {
+      const [activities, setActivities] = useState([]);
+
+      useEffect(() => {
+        const stored = localStorage.getItem("tct-activities");
+        if (stored) {
+          setActivities(JSON.parse(stored));
+        } else {
+          setActivities(initialActivities.map(a => ({ ...a, status: "pendiente" })));
+        }
+      }, []);
+
+      useEffect(() => {
+        if (activities.length) {
+          localStorage.setItem("tct-activities", JSON.stringify(activities));
+        }
+      }, [activities]);
+
+      const toggleStatus = (id) => {
+        setActivities(prev => prev.map(a =>
+          a.id === id
+            ? { ...a, status: a.status === "realizada" ? "pendiente" : "realizada" }
+            : a
+        ));
+      };
+
+      return (
+        <div className="min-h-screen p-6">
+          <h1 className="text-3xl font-bold mb-2">TIME CULITOS TOGETHER</h1>
+          <p className="mb-6 text-neutral-600">Elegid una actividad. Luego dejad el móvil a un lado.</p>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            {activities.map(activity => (
+              <div key={activity.id} className="bg-white rounded-2xl shadow p-4">
+                <h2 className="text-xl font-semibold">{activity.title}</h2>
+                <p className="text-xs text-neutral-500">{activity.category}</p>
+                <p className="mt-2 text-sm">{activity.description}</p>
+                <p className="text-sm mt-2"><strong>Objetivo:</strong> {activity.goal}</p>
+                <p className="text-sm"><strong>Duración:</strong> {activity.duration}</p>
+                <p className="text-sm"><strong>Música:</strong> {activity.music}</p>
+
+                <ul className="list-disc ml-5 mt-2 text-sm">
+                  {activity.questions.map((q, i) => <li key={i}>{q}</li>)}
+                </ul>
+
+                <div className="mt-4 flex justify-between items-center">
+                  <button
+                    onClick={() => toggleStatus(activity.id)}
+                    className="px-3 py-1 rounded bg-black text-white text-sm"
+                  >
+                    {activity.status === "realizada" ? "Marcar pendiente" : "Marcar realizada"}
+                  </button>
+                  <span className="text-xs text-neutral-500">Estado: {activity.status}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+  </script>
+</body>
+</html>
